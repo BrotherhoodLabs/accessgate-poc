@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: accessgate-poc
+  labels:
+    name: accessgate-poc
+    app: accessgate
+    environment: development

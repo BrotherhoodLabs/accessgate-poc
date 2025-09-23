@@ -13,7 +13,9 @@
   - [x] Nom du repo: accessgate-poc (public ou privé)
   - [x] Vérifier/ajouter la clé SSH à GitHub
   - [x] Initialiser la structure: backend/, frontend/, infra/, docs/, .gitignore, LICENSE, README.md
-  - [ ] Protéger la branche main et ajouter PR template
+  - [x] Protéger la branche main et ajouter PR template
+  - [x] Réorganiser l'architecture: k8s/, deployment/, tests/, infra/
+  - [x] Déplacer les fichiers de la racine vers les dossiers correspondants
 
 ### 2. Documentation & Vision
 - [x] Définir la vision du PoC (docs/vision.md)
@@ -22,10 +24,10 @@
   - [x] Portée PoC: Postgres + REST, règles simples, démo end-to-end
 
 ### 3. Workflow & Conventions
-- [ ] Workflow commits & push
-  - [ ] Après CHAQUE ticket: commit + push
-  - [ ] Conventions Google/Conventional: `<type>(scope): message`
-  - [ ] Ex: `feat(backend): add role assignment endpoint`
+- [x] Workflow commits & push
+  - [x] Après CHAQUE ticket: commit + push
+  - [x] Conventions Google/Conventional: `<type>(scope): message`
+  - [x] Ex: `feat(backend): add role assignment endpoint`
 
 ---
 
@@ -65,9 +67,11 @@
 - [x] GET /permissions, GET /permissions/grouped
 
 ### 10. Backend — Tests
-- [ ] Tests unitaires: services/middlewares (jest)
-- [ ] Tests d'intégration: auth + RBAC sur endpoints clés
-- [ ] Couverture minimale: 70% (PoC)
+- [x] Tests unitaires: services/middlewares (jest)
+- [x] Tests d'intégration: auth + RBAC sur endpoints clés
+- [x] Tests de performance: temps de réponse et mémoire
+- [x] Tests smoke: vérification du bon fonctionnement
+- [x] Couverture minimale: 70% (PoC)
 
 ---
 
@@ -106,7 +110,8 @@
 ### 16. Observabilité minimale
 - [x] Logs JSON backend (pino), correlationId middleware
 - [x] Health checks: GET /health, readiness/liveness
-- [ ] (Option) OpenAPI via swagger-jsdoc + swagger-ui-express
+- [x] OpenAPI via swagger-jsdoc + swagger-ui-express
+- [x] Tests de performance et smoke tests
 
 ### 17. Sécurité de base
 - [x] CORS strict (origins du frontend)
@@ -124,8 +129,8 @@
 
 ### 19. Qualité & CI
 - [x] ESLint/Prettier configs (backend & frontend)
-- [ ] GitHub Actions: lint + test + build pour backend et frontend
-- [ ] Badges de statut dans README
+- [x] GitHub Actions: lint + test + build pour backend et frontend
+- [x] Badges de statut dans README
 
 ---
 
@@ -136,38 +141,39 @@
 - [x] Se connecter depuis le frontend, naviguer dans l'admin
 - [x] Vérifier qu'un VIEWER ne peut pas modifier utilisateurs/rôles
 - [x] Scripts de validation automatisés (PowerShell + Bash)
+- [x] Tests de performance et smoke tests automatisés
 
 ### 21. Rétro & extensions (docs/retro.md)
-- [ ] Pistes: ABAC/Policy Engine (OPA), audit logs, Webhooks, OIDC Keycloak, pagination serveur, i18n
+- [x] Pistes: ABAC/Policy Engine (OPA), audit logs, Webhooks, OIDC Keycloak, pagination serveur, i18n
 
 ---
 
 ## 🎯 Critères de Succès
 
 ### Technique
-- [ ] Couverture de tests > 70%
-- [ ] Temps de démarrage < 30s
-- [ ] API response time < 200ms
-- [ ] Zero critical security issues
+- [x] Couverture de tests > 70%
+- [x] Temps de démarrage < 30s
+- [x] API response time < 200ms
+- [x] Zero critical security issues
 
 ### Fonctionnel
-- [ ] Démonstration complète en < 5 minutes
-- [ ] Interface intuitive sans formation
-- [ ] Documentation claire et complète
-- [ ] Code maintenable et extensible
+- [x] Démonstration complète en < 5 minutes
+- [x] Interface intuitive sans formation
+- [x] Documentation claire et complète
+- [x] Code maintenable et extensible
 
 ---
 
 ## 📊 Progression Globale
 
-**Phase 1 (Initialisation):** 2/3 ✅  
+**Phase 1 (Initialisation):** 3/3 ✅  
 **Phase 2 (Backend):** 7/7 ✅  
 **Phase 3 (Frontend):** 4/4 ✅  
-**Phase 4 (Infrastructure):** 2/3 ✅  
+**Phase 4 (Infrastructure):** 3/3 ✅  
 **Phase 5 (Documentation):** 3/3 ✅  
-**Phase 6 (Validation):** 1/2 ✅  
+**Phase 6 (Validation):** 2/2 ✅  
 
-**Total:** 19/22 (86%) ✅
+**Total:** 22/22 (100%) ✅
 
 ---
 

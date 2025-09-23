@@ -2,10 +2,18 @@
 
 Un Proof of Concept (PoC) démontrant un système RBAC complet avec authentification JWT et interface d'administration.
 
+[![Build Status](https://github.com/BrotherhoodLabs/accessgate-poc/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/BrotherhoodLabs/accessgate-poc/actions)
+[![Code Coverage](https://codecov.io/gh/BrotherhoodLabs/accessgate-poc/branch/main/graph/badge.svg)](https://codecov.io/gh/BrotherhoodLabs/accessgate-poc)
+[![Security Scan](https://github.com/BrotherhoodLabs/accessgate-poc/workflows/Security%20Scan/badge.svg)](https://github.com/BrotherhoodLabs/accessgate-poc/security)
+[![Docker Build](https://github.com/BrotherhoodLabs/accessgate-poc/workflows/Docker%20Build/badge.svg)](https://github.com/BrotherhoodLabs/accessgate-poc/pkgs/container/accessgate-poc)
 [![Backend Status](https://img.shields.io/badge/Backend-Ready-brightgreen)](backend/)
 [![Frontend Status](https://img.shields.io/badge/Frontend-Ready-brightgreen)](frontend/)
 [![Docker Status](https://img.shields.io/badge/Docker-Ready-blue)](docker-compose.yml)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
 ## 🎯 Vision
 
@@ -36,12 +44,13 @@ cd accessgate-poc
 2. **Démarrer avec Docker Compose (Recommandé)**
 ```bash
 # Linux/Mac
-./start-dev.sh
+./deployment/start-dev.sh
 
 # Windows PowerShell
-.\start-dev.ps1
+.\deployment\start-dev.ps1
 
 # Ou manuellement
+cd infra
 docker-compose up -d
 ```
 

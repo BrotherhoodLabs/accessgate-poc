@@ -2,6 +2,62 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthService, registerSchema, loginSchema } from '../services/authService';
 import { createError } from '../middleware/errorHandler';
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     LoginRequest:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: admin@accessgate.com
+ *         password:
+ *           type: string
+ *           minLength: 8
+ *           example: Admin123!
+ *     RegisterRequest:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *         - firstName
+ *         - lastName
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: user@accessgate.com
+ *         password:
+ *           type: string
+ *           minLength: 8
+ *           example: Password123!
+ *         firstName:
+ *           type: string
+ *           example: John
+ *         lastName:
+ *           type: string
+ *           example: Doe
+ *     AuthResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: Login successful
+ *         accessToken:
+ *           type: string
+ *           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *         refreshToken:
+ *           type: string
+ *           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *         user:
+ *           $ref: '#/components/schemas/User'
+ */
+
 export class AuthController {
   static async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {

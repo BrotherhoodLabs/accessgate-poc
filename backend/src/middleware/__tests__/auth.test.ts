@@ -81,7 +81,7 @@ describe('Auth Middleware', () => {
     it('should return 401 if token is invalid', async () => {
       (mockReq.header as jest.Mock).mockReturnValue('Bearer invalid-token');
       (jwt.verify as jest.Mock).mockImplementation(() => {
-        throw new Error('Invalid token');
+        throw new jwt.JsonWebTokenError('Invalid token');
       });
 
       await checkAuth(mockReq as any, mockRes as any, mockNext);

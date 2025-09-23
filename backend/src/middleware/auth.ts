@@ -51,16 +51,16 @@ export const checkAuth = async (
     }
 
     // Extract roles and permissions
-    const roles = user.userRoles.map(ur => ur.role.name);
-    const permissions = user.userRoles.flatMap(ur => 
-      ur.role.rolePermissions.map(rp => rp.permission.name)
+    const roles = user.userRoles.map((ur: any) => ur.role.name);
+    const permissions = user.userRoles.flatMap((ur: any) => 
+      ur.role.rolePermissions.map((rp: any) => rp.permission.name)
     );
 
     req.user = {
       id: user.id,
       email: user.email,
       roles,
-      permissions: [...new Set(permissions)], // Remove duplicates
+      permissions: [...new Set(permissions)] as string[], // Remove duplicates
     };
 
     next();

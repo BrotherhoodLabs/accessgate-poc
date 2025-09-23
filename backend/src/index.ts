@@ -16,6 +16,8 @@ import { rateLimiter } from './middleware/rateLimiter';
 import { correlationIdMiddleware } from './middleware/correlationId';
 import { requestLogger } from './middleware/requestLogger';
 import logger from './utils/logger';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger';
 
 // Load environment variables
 dotenv.config();
@@ -48,6 +50,13 @@ app.get('/health', (req, res) => {
     uptime: process.uptime(),
   });
 });
+
+// Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'AccessGate PoC API Documentation',
+}));
 
 // API routes
 app.use('/api/auth', authRoutes);

@@ -16,6 +16,9 @@ export class RoleController {
   static async getRoleById(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
+      if (!id) {
+        return next(createError('Role ID is required', 400));
+      }
       const role = await RoleService.getRoleById(id);
       res.json(role);
     } catch (error) {
@@ -40,6 +43,9 @@ export class RoleController {
   static async updateRole(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
+      if (!id) {
+        return next(createError('Role ID is required', 400));
+      }
       const roleData = updateRoleSchema.parse(req.body);
       const role = await RoleService.updateRole(id, roleData);
 
@@ -55,6 +61,9 @@ export class RoleController {
   static async deleteRole(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
+      if (!id) {
+        return next(createError('Role ID is required', 400));
+      }
       const result = await RoleService.deleteRole(id);
       res.json(result);
     } catch (error) {
@@ -67,8 +76,11 @@ export class RoleController {
       const { id: roleId } = req.params;
       const { permissionId } = req.body;
 
+      if (!roleId) {
+        return next(createError('Role ID is required', 400));
+      }
       if (!permissionId) {
-        throw createError('Permission ID required', 400);
+        return next(createError('Permission ID required', 400));
       }
 
       const result = await RoleService.assignPermission(roleId, permissionId);
@@ -81,6 +93,9 @@ export class RoleController {
   static async removePermission(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id: roleId, permissionId } = req.params;
+      if (!roleId || !permissionId) {
+        return next(createError('Role ID and Permission ID are required', 400));
+      }
       const result = await RoleService.removePermission(roleId, permissionId);
       res.json(result);
     } catch (error) {

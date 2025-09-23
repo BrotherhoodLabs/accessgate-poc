@@ -91,7 +91,7 @@ export class PermissionService {
       if (!acc[permission.resource]) {
         acc[permission.resource] = [];
       }
-      acc[permission.resource].push(permission);
+      acc[permission.resource]!.push(permission);
       return acc;
     }, {} as Record<string, typeof permissions>);
 

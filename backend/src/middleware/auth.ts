@@ -24,7 +24,7 @@ export const checkAuth = async (
       throw createError('Access token required', 401);
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+    const decoded = jwt.verify(token, process.env['JWT_SECRET']!) as { userId: string };
     
     // Get user with roles and permissions
     const user = await prisma.user.findUnique({

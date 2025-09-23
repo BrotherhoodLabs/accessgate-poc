@@ -18,7 +18,7 @@ import { rateLimiter } from './middleware/rateLimiter';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 8000;
+const port = process.env['PORT'] || 8000;
 
 // Initialize Prisma client
 export const prisma = new PrismaClient();
@@ -26,7 +26,7 @@ export const prisma = new PrismaClient();
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
+  origin: process.env['CORS_ORIGINS']?.split(',') || ['http://localhost:3000'],
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));

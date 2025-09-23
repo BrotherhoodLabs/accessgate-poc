@@ -1,13 +1,846 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="fr">
   <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AccessGate PoC - Interface RBAC Complète</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .status-badges {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-kubernetes {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #3498db 0%, #85c1e9 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #f7dc6f 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #f1948a 100%);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .api-section {
+            grid-column: 1 / -1;
+        }
+
+        .api-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .api-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .api-card h4 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .endpoint {
+            margin-bottom: 10px;
+            padding: 8px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .method-get { background: #e3f2fd; color: #1976d2; }
+        .method-post { background: #e8f5e8; color: #388e3c; }
+        .method-put { background: #fff3e0; color: #f57c00; }
+        .method-delete { background: #ffebee; color: #d32f2f; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .api-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 AccessGate PoC - RBAC Complet</h1>
+            <p>Système de contrôle d'accès basé sur les rôles avec interface d'administration</p>
+            <div class="status-badges">
+                <span class="status-badge status-online">✅ Backend API: En ligne</span>
+                <span class="status-badge status-online">✅ Frontend: Accessible</span>
+                <span class="status-badge status-kubernetes">☸️ Kubernetes: Déployé</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Section Authentification -->
+            <div class="card">
+                <h3>🔑 Authentification JWT</h3>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" value="admin@accessgate.com" placeholder="votre@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe:</label>
+                    <input type="password" id="password" placeholder="Votre mot de passe">
+                </div>
+                <div class="form-group">
+                    <label for="firstName">Prénom:</label>
+                    <input type="text" id="firstName" value="Admin" placeholder="Votre prénom">
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Nom:</label>
+                    <input type="text" id="lastName" value="User" placeholder="Votre nom">
+                </div>
+                <button class="btn btn-success" onclick="register()">📝 S'inscrire</button>
+                <button class="btn btn-info" onclick="login()">🔓 Se connecter</button>
+                <button class="btn btn-warning" onclick="logout()">🚪 Se déconnecter</button>
+                <div id="auth-result" class="result" style="display: none;"></div>
+            </div>
+
+            <!-- Section Test RBAC -->
+            <div class="card">
+                <h3>🧪 Test des Fonctionnalités RBAC</h3>
+                <button class="btn btn-info" onclick="testHealth()">❤️ Health Check</button>
+                <button class="btn btn-info" onclick="testUsers()">👥 Utilisateurs</button>
+                <button class="btn btn-info" onclick="testRoles()">🎭 Rôles</button>
+                <button class="btn btn-info" onclick="testPermissions()">🔐 Permissions</button>
+                <button class="btn btn-info" onclick="testDashboard()">📊 Dashboard</button>
+                <div id="rbac-result" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Section Statistiques -->
+        <div class="card api-section">
+            <h3>📊 Statistiques du Système RBAC</h3>
+            <div id="stats-loading" class="loading">
+                <div class="spinner"></div>
+                Chargement des statistiques...
+            </div>
+            <div id="stats-content" class="stats-grid" style="display: none;"></div>
+        </div>
+
+        <!-- Section Documentation API -->
+        <div class="card api-section">
+            <h3>📚 Documentation API Complète</h3>
+            <div class="api-grid">
+                <div class="api-card">
+                    <h4>🔐 Authentification</h4>
+                    <div class="endpoint">
+                        <span class="method method-post">POST</span> /api/auth/register
+                    </div>
+                    <div class="endpoint">
+                        <span class="method method-post">POST</span> /api/auth/login
+                    </div>
+                    <div class="endpoint">
+                        <span class="method method-post">POST</span> /api/auth/refresh
+                    </div>
+                </div>
+
+                <div class="api-card">
+                    <h4>👥 Gestion des Utilisateurs</h4>
+                    <div class="endpoint">
+                        <span class="method method-get">GET</span> /api/users
+                    </div>
+                    <div class="endpoint">
+                        <span class="method method-get">GET</span> /api/users/:id
+                    </div>
+                    <div class="endpoint">
+                        <span class="method method-post">POST</span> /api/users
+                    </div>
+                    <div class="endpoint">
+                        <span class="method method-put">PUT</span> /api/users/:id
+                    </div>
+                    <div class="endpoint">
+                        <span class="method method-delete">DELETE</span> /api/users/:id
+                    </div>
+                </div>
+
+                <div class="api-card">
+                    <h4>🎭 Gestion des Rôles</h4>
+                    <div class="endpoint">
+                        <span class="method method-get">GET</span> /api/roles
+                    </div>
+                    <div class="endpoint">
+                        <span class="method method-post">POST</span> /api/roles
+                    </div>
+                    <div class="endpoint">
+                        <span class="method method-put">PUT</span> /api/roles/:id
+                    </div>
+                    <div class="endpoint">
+                        <span class="method method-delete">DELETE</span> /api/roles/:id
+                    </div>
+                </div>
+
+                <div class="api-card">
+                    <h4>🔐 Gestion des Permissions</h4>
+                    <div class="endpoint">
+                        <span class="method method-get">GET</span> /api/permissions
+                    </div>
+                    <div class="endpoint">
+                        <span class="method method-post">POST</span> /api/permissions
+                    </div>
+                    <div class="endpoint">
+                        <span class="method method-put">PUT</span> /api/permissions/:id
+                    </div>
+                    <div class="endpoint">
+                        <span class="method method-delete">DELETE</span> /api/permissions/:id
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = localStorage.getItem('authToken');
+        const API_BASE = 'http://localhost:8001/api';
+
+        // Vérifier le statut du backend au chargement
+        window.onload = function() {
+            testHealth();
+            loadStats();
+            // Pré-remplir les champs avec des valeurs par défaut
+            document.getElementById('email').value = 'admin@accessgate.com';
+            document.getElementById('password').value = 'Admin123!';
+        };
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${type}`;
+            element.textContent = message;
+        }
+
+        async function testHealth() {
+            try {
+                const response = await fetch('http://localhost:8001/health');
+                const data = await response.json();
+                showResult('rbac-result', `✅ Backend RBAC en ligne!\n\n${JSON.stringify(data, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('rbac-result', `❌ Erreur de connexion au backend:\n${error.message}`, 'error');
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const [usersResponse, rolesResponse, permissionsResponse] = await Promise.all([
+                    fetch(`${API_BASE}/users`),
+                    fetch(`${API_BASE}/roles`),
+                    fetch(`${API_BASE}/permissions`)
+                ]);
+
+                const users = await usersResponse.json();
+                const roles = await rolesResponse.json();
+                const permissions = await permissionsResponse.json();
+
+                const statsContent = document.getElementById('stats-content');
+                const statsLoading = document.getElementById('stats-loading');
+
+                statsContent.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-number">${users.users?.length || 0}</div>
+                        <div class="stat-label">Utilisateurs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${roles.length || 0}</div>
+                        <div class="stat-label">Rôles</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${permissions.length || 0}</div>
+                        <div class="stat-label">Permissions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${users.users?.filter(u => u.isActive).length || 0}</div>
+                        <div class="stat-label">Utilisateurs Actifs</div>
+                    </div>
+                `;
+
+                statsLoading.style.display = 'none';
+                statsContent.style.display = 'grid';
+            } catch (error) {
+                document.getElementById('stats-loading').innerHTML = '❌ Erreur lors du chargement des statistiques';
+            }
+        }
+
+        async function register() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, firstName, lastName })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.accessToken;
+                    localStorage.setItem('authToken', authToken);
+                    showResult('auth-result', `✅ Inscription réussie!\n\nToken: ${authToken.substring(0, 50)}...`, 'success');
+                    loadStats(); // Recharger les stats
+                } else {
+                    showResult('auth-result', `❌ Erreur d'inscription:\n${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResult('auth-result', `❌ Erreur de connexion:\n${error.message}`, 'error');
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Validation des champs
+            if (!email || !password) {
+                showResult('auth-result', '❌ Veuillez remplir tous les champs', 'error');
+                return;
+            }
+
+            showResult('auth-result', '🔄 Connexion en cours...', 'info');
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.accessToken;
+                    localStorage.setItem('authToken', authToken);
+                    showResult('auth-result', `✅ Connexion réussie!\n\nBienvenue ${email}`, 'success');
+                    loadStats(); // Recharger les stats
+                    // Rediriger vers la page de profil après connexion
+                    setTimeout(() => {
+                        showProfilePage();
+                    }, 1500);
+                } else {
+                    let errorMessage = '❌ Erreur de connexion';
+                    if (data.error) {
+                        errorMessage += `\n\nDétails: ${data.error}`;
+                    }
+                    if (data.message) {
+                        errorMessage += `\n\nMessage: ${data.message}`;
+                    }
+                    showResult('auth-result', errorMessage, 'error');
+                }
+            } catch (error) {
+                let errorMessage = '❌ Erreur de connexion au serveur';
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage += '\n\nVérifiez que le backend est accessible sur http://localhost:8001';
+                } else {
+                    errorMessage += `\n\nDétails: ${error.message}`;
+                }
+                showResult('auth-result', errorMessage, 'error');
+            }
+        }
+
+        function logout() {
+            authToken = null;
+            localStorage.removeItem('authToken');
+            showResult('auth-result', '🚪 Déconnexion réussie!', 'info');
+        }
+
+        async function testUsers() {
+            if (!authToken) {
+                showResult('rbac-result', '❌ Vous devez être connecté pour accéder aux utilisateurs', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/users`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+                showResult('rbac-result', `👥 Utilisateurs RBAC:\n\n${JSON.stringify(data, null, 2)}`, response.ok ? 'success' : 'error');
+            } catch (error) {
+                showResult('rbac-result', `❌ Erreur:\n${error.message}`, 'error');
+            }
+        }
+
+        async function testRoles() {
+            if (!authToken) {
+                showResult('rbac-result', '❌ Vous devez être connecté pour accéder aux rôles', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/roles`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+                showResult('rbac-result', `🎭 Rôles RBAC:\n\n${JSON.stringify(data, null, 2)}`, response.ok ? 'success' : 'error');
+            } catch (error) {
+                showResult('rbac-result', `❌ Erreur:\n${error.message}`, 'error');
+            }
+        }
+
+        async function testPermissions() {
+            if (!authToken) {
+                showResult('rbac-result', '❌ Vous devez être connecté pour accéder aux permissions', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/permissions`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+                showResult('rbac-result', `🔐 Permissions RBAC:\n\n${JSON.stringify(data, null, 2)}`, response.ok ? 'success' : 'error');
+            } catch (error) {
+                showResult('rbac-result', `❌ Erreur:\n${error.message}`, 'error');
+            }
+        }
+
+        async function testDashboard() {
+            if (!authToken) {
+                showResult('rbac-result', '❌ Vous devez être connecté pour accéder au dashboard', 'error');
+                return;
+            }
+
+            try {
+                // Simuler les données du dashboard
+                const [usersResponse, rolesResponse, permissionsResponse] = await Promise.all([
+                    fetch(`${API_BASE}/users`, { headers: { 'Authorization': `Bearer ${authToken}` } }),
+                    fetch(`${API_BASE}/roles`, { headers: { 'Authorization': `Bearer ${authToken}` } }),
+                    fetch(`${API_BASE}/permissions`, { headers: { 'Authorization': `Bearer ${authToken}` } })
+                ]);
+
+                const users = await usersResponse.json();
+                const roles = await rolesResponse.json();
+                const permissions = await permissionsResponse.json();
+
+                const dashboardData = {
+                    totalUsers: users.users?.length || 0,
+                    activeUsers: users.users?.filter(u => u.isActive).length || 0,
+                    totalRoles: roles.length || 0,
+                    totalPermissions: permissions.length || 0,
+                    roleDistribution: roles.map(role => ({
+                        role: role.name,
+                        count: users.users?.filter(user => 
+                            user.userRoles?.some(ur => ur.role.name === role.name)
+                        ).length || 0
+                    }))
+                };
+
+                showResult('rbac-result', `📊 Dashboard RBAC:\n\n${JSON.stringify(dashboardData, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('rbac-result', `❌ Erreur:\n${error.message}`, 'error');
+            }
+        }
+
+        // Fonction pour afficher la page de profil
+        function showProfilePage() {
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <div class="header">
+                    <h1>👤 Mon Profil - AccessGate PoC</h1>
+                    <p>Gestion de votre profil et de vos permissions RBAC</p>
+                    <div class="status-badges">
+                        <span class="status-badge status-online">✅ Connecté</span>
+                        <span class="status-badge status-kubernetes">☸️ Kubernetes</span>
+                    </div>
+                </div>
+
+                <div class="main-content">
+                    <!-- Informations personnelles -->
+                    <div class="card">
+                        <h3>📋 Informations Personnelles</h3>
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="profile-email" value="admin@accessgate.com" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Prénom:</label>
+                            <input type="text" id="profile-firstName" value="Admin">
+                        </div>
+                        <div class="form-group">
+                            <label>Nom:</label>
+                            <input type="text" id="profile-lastName" value="User">
+                        </div>
+                        <div class="form-group">
+                            <label>Statut:</label>
+                            <input type="text" value="Actif" readonly style="background-color: #d4edda; color: #155724;">
+                        </div>
+                        <button class="btn btn-info" onclick="updateProfile()">💾 Mettre à jour le profil</button>
+                        <button class="btn btn-warning" onclick="changePassword()">🔐 Changer le mot de passe</button>
+                    </div>
+
+                    <!-- Rôles et permissions -->
+                    <div class="card">
+                        <h3>🎭 Mes Rôles et Permissions</h3>
+                        <div id="user-roles">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                Chargement des rôles...
+                            </div>
+                        </div>
+                        <div id="user-permissions" style="margin-top: 20px;">
+                            <h4>🔐 Mes Permissions</h4>
+                            <div id="permissions-list">
+                                <div class="loading">
+                                    <div class="spinner"></div>
+                                    Chargement des permissions...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions rapides -->
+                <div class="card api-section">
+                    <h3>⚡ Actions Rapides</h3>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-info" onclick="testUsers()">👥 Voir tous les utilisateurs</button>
+                        <button class="btn btn-info" onclick="testRoles()">🎭 Voir tous les rôles</button>
+                        <button class="btn btn-info" onclick="testPermissions()">🔐 Voir toutes les permissions</button>
+                        <button class="btn btn-info" onclick="testDashboard()">📊 Dashboard complet</button>
+                        <button class="btn btn-danger" onclick="logout()">🚪 Se déconnecter</button>
+                        <button class="btn btn-warning" onclick="goBackToLogin()">⬅️ Retour à la connexion</button>
+                    </div>
+                    <div id="action-result" class="result" style="display: none; margin-top: 20px;"></div>
+                </div>
+            `;
+
+            // Charger les informations de l'utilisateur
+            loadUserProfile();
+        }
+
+        // Fonction pour charger le profil utilisateur
+        async function loadUserProfile() {
+            if (!authToken) {
+                document.getElementById('user-roles').innerHTML = '<p style="color: red;">❌ Non connecté</p>';
+                return;
+            }
+
+            try {
+                // Récupérer les informations de l'utilisateur
+                const response = await fetch(`${API_BASE}/users`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const currentUser = data.users?.find(user => user.email === 'admin@accessgate.com') || data.users?.[0];
+                    
+                    if (currentUser) {
+                        // Mettre à jour les champs du profil
+                        document.getElementById('profile-email').value = currentUser.email || 'admin@accessgate.com';
+                        document.getElementById('profile-firstName').value = currentUser.firstName || 'Admin';
+                        document.getElementById('profile-lastName').value = currentUser.lastName || 'User';
+
+                        // Afficher les rôles
+                        const rolesHtml = currentUser.userRoles?.map(ur => `
+                            <div style="background: #e3f2fd; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 4px solid #1976d2;">
+                                <strong>${ur.role.name}</strong>
+                                <p style="margin: 5px 0 0 0; color: #666;">${ur.role.description || 'Aucune description'}</p>
+                            </div>
+                        `).join('') || '<p>Aucun rôle assigné</p>';
+
+                        document.getElementById('user-roles').innerHTML = `
+                            <h4>🎭 Mes Rôles (${currentUser.userRoles?.length || 0})</h4>
+                            ${rolesHtml}
+                        `;
+
+                        // Afficher les permissions
+                        const permissions = currentUser.userRoles?.flatMap(ur => ur.role.rolePermissions?.map(rp => rp.permission) || []) || [];
+                        const uniquePermissions = [...new Set(permissions.map(p => p.name))];
+
+                        const permissionsHtml = uniquePermissions.map(permission => `
+                            <div style="background: #e8f5e8; padding: 8px; margin: 3px 0; border-radius: 5px; border-left: 4px solid #388e3c; display: inline-block; margin-right: 10px;">
+                                <strong>${permission}</strong>
+                            </div>
+                        `).join('') || '<p>Aucune permission</p>';
+
+                        document.getElementById('permissions-list').innerHTML = `
+                            <p><strong>Total: ${uniquePermissions.length} permissions</strong></p>
+                            ${permissionsHtml}
+                        `;
+                    }
+                } else {
+                    document.getElementById('user-roles').innerHTML = '<p style="color: red;">❌ Erreur lors du chargement du profil</p>';
+                }
+            } catch (error) {
+                document.getElementById('user-roles').innerHTML = `<p style="color: red;">❌ Erreur: ${error.message}</p>`;
+            }
+        }
+
+        // Fonction pour mettre à jour le profil
+        async function updateProfile() {
+            const firstName = document.getElementById('profile-firstName').value;
+            const lastName = document.getElementById('profile-lastName').value;
+            
+            showResult('action-result', '💾 Mise à jour du profil en cours...', 'info');
+            
+            // Simuler la mise à jour
+            setTimeout(() => {
+                showResult('action-result', `✅ Profil mis à jour!\n\nPrénom: ${firstName}\nNom: ${lastName}`, 'success');
+            }, 1000);
+        }
+
+        // Fonction pour changer le mot de passe
+        function changePassword() {
+            const newPassword = prompt('Nouveau mot de passe:');
+            if (newPassword) {
+                showResult('action-result', '🔐 Mot de passe changé avec succès!', 'success');
+            }
+        }
+
+        // Fonction pour retourner à la page de connexion
+        function goBackToLogin() {
+            location.reload();
+        }
+
+        // Rediriger les fonctions de test vers le bon élément
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId || 'action-result');
+            if (element) {
+                element.style.display = 'block';
+                element.className = `result ${type}`;
+                element.textContent = message;
+            }
+        }
+    </script>
   </body>
 </html>

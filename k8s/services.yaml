@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: accessgate-poc
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: accessgate-backend-service
+  namespace: accessgate-poc
+spec:
+  selector:
+    app: accessgate-backend
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: accessgate-frontend-service
+  namespace: accessgate-poc
+spec:
+  selector:
+    app: accessgate-frontend
+  ports:
+    - port: 3000
+      targetPort: 80
+  type: ClusterIP

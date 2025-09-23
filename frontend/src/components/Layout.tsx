@@ -15,6 +15,10 @@ import {
   AccountCircle,
   Logout,
   Settings,
+  Dashboard,
+  People,
+  Security,
+  Key,
 } from '@mui/icons-material';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
@@ -59,7 +63,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Button
                 color="inherit"
+                onClick={() => navigate('/dashboard')}
+                startIcon={<Dashboard />}
+                sx={{ display: { xs: 'none', sm: 'block' } }}
+              >
+                Dashboard
+              </Button>
+              <Button
+                color="inherit"
                 onClick={() => navigate('/users')}
+                startIcon={<People />}
                 sx={{ display: { xs: 'none', sm: 'block' } }}
               >
                 Utilisateurs
@@ -67,9 +80,26 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Button
                 color="inherit"
                 onClick={() => navigate('/roles')}
+                startIcon={<Security />}
                 sx={{ display: { xs: 'none', sm: 'block' } }}
               >
                 Rôles
+              </Button>
+              <Button
+                color="inherit"
+                onClick={() => navigate('/permissions')}
+                startIcon={<Key />}
+                sx={{ display: { xs: 'none', sm: 'block' } }}
+              >
+                Permissions
+              </Button>
+              <Button
+                color="inherit"
+                onClick={() => navigate('/audit')}
+                startIcon={<Security />}
+                sx={{ display: { xs: 'none', sm: 'block' } }}
+              >
+                Audit
               </Button>
               
               <IconButton
@@ -102,7 +132,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               >
                 <MenuItem onClick={handleProfile}>
                   <AccountCircle sx={{ mr: 1 }} />
-                  Profil
+                  Mon Profil
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>
                   <Logout sx={{ mr: 1 }} />

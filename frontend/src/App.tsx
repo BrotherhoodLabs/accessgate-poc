@@ -11,6 +11,10 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { UsersPage } from './pages/UsersPage';
 import { RolesPage } from './pages/RolesPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { PermissionsPage } from './pages/PermissionsPage';
+import { ProfilePage } from './pages/ProfilePage';
+import { AuditPage } from './pages/AuditPage';
 
 const theme = createTheme({
   palette: {
@@ -58,7 +62,17 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout>
-                  <HomePage />
+                  <DashboardPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <DashboardPage />
                 </Layout>
               </ProtectedRoute>
             }
@@ -79,6 +93,36 @@ function App() {
               <ProtectedRoute requiredPermissions={['role.read']}>
                 <Layout>
                   <RolesPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/permissions"
+            element={
+              <ProtectedRoute requiredPermissions={['role.read']}>
+                <Layout>
+                  <PermissionsPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ProfilePage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/audit"
+            element={
+              <ProtectedRoute requiredPermissions={['audit.read']}>
+                <Layout>
+                  <AuditPage />
                 </Layout>
               </ProtectedRoute>
             }

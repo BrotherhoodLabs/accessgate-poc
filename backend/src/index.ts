@@ -1,43 +1,37 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
-
-// Import routes
+import { correlationIdMiddleware } from './utils/correlationId';
+import { requestLogger, appLogger } from './utils/logger';
+import { errorHandler } from './middleware/errorHandler';
+import { rateLimiter } from './middleware/rateLimiter';
+import { metricsMiddleware } from './middleware/metrics';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import roleRoutes from './routes/roles';
 import permissionRoutes from './routes/permissions';
-
-// Import middleware
-import { errorHandler } from './middleware/errorHandler';
-import { rateLimiter } from './middleware/rateLimiter';
-import { correlationIdMiddleware } from './middleware/correlationId';
-import { requestLogger } from './middleware/requestLogger';
-import logger from './utils/logger';
-import swaggerUi from 'swagger-ui-express';
+import metricsRoutes from './routes/metrics';
 import { swaggerSpec } from './config/swagger';
-
-// Load environment variables
-dotenv.config();
+import swaggerUi from 'swagger-ui-express';
 
 const app = express();
-const port = process.env['PORT'] || 8000;
+const PORT = process.env['PORT'] || 8000;
 
-// Initialize Prisma client
-export const prisma = new PrismaClient();
-
-// Middleware
+// Middleware de sécurité
 app.use(helmet());
+app.use(cors({
+  origin: process.env['CORS_ORIGINS']?.split(',') || ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: true
+}));
+
+// Middleware de parsing
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Middleware de logging et métriques
 app.use(correlationIdMiddleware);
 app.use(requestLogger);
-app.use(cors({
-  origin: process.env['CORS_ORIGINS']?.split(',') || ['http://localhost:3000'],
-  credentials: true,
-}));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(metricsMiddleware);
 
 // Rate limiting
 app.use(rateLimiter);
@@ -47,55 +41,49 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
+    uptime: process.uptime()
   });
 });
 
-// Swagger documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  explorer: true,
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'AccessGate PoC API Documentation',
-}));
+// Documentation Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// API routes
+// Routes API
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/permissions', permissionRoutes);
+app.use('/api/metrics', metricsRoutes);
 
-// Error handling
+// Middleware de gestion d'erreurs
 app.use(errorHandler);
 
-// 404 handler
+// Gestionnaire 404
 app.use('*', (req, res) => {
   res.status(404).json({
-    error: 'Route not found',
-    path: req.originalUrl,
+    error: 'Not Found',
+    message: `Route ${req.originalUrl} not found`,
+    timestamp: new Date().toISOString()
   });
 });
 
-// Graceful shutdown
-process.on('SIGINT', async () => {
-  console.log('Shutting down gracefully...');
-  await prisma.$disconnect();
+// Démarrage du serveur
+app.listen(PORT, () => {
+  appLogger.info(`🚀 AccessGate Backend API démarré sur le port ${PORT}`);
+  appLogger.info(`📊 Métriques disponibles sur http://localhost:${PORT}/api/metrics/metrics`);
+  appLogger.info(`📚 Documentation API disponible sur http://localhost:${PORT}/api-docs`);
+  appLogger.info(`🏥 Health check disponible sur http://localhost:${PORT}/health`);
+});
+
+// Gestion des signaux de fermeture
+process.on('SIGTERM', () => {
+  appLogger.info('SIGTERM reçu, fermeture gracieuse du serveur...');
   process.exit(0);
 });
 
-process.on('SIGTERM', async () => {
-  console.log('Shutting down gracefully...');
-  await prisma.$disconnect();
+process.on('SIGINT', () => {
+  appLogger.info('SIGINT reçu, fermeture gracieuse du serveur...');
   process.exit(0);
-});
-
-// Start server
-app.listen(port, () => {
-  logger.info({
-    port,
-    environment: process.env['NODE_ENV'] || 'development',
-  }, `🚀 Server running on port ${port}`);
-  logger.info(`📊 Health check: http://localhost:${port}/health`);
-  logger.info(`🔐 API Base URL: http://localhost:${port}/api`);
 });
 
 export default app;

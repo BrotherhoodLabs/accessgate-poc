@@ -1,17 +1,51 @@
-// Test setup file
-import dotenv from 'dotenv';
+import { PrismaClient } from '@prisma/client';
+import { testLogger } from '../utils/logger';
 
-// Load test environment variables
-dotenv.config({ path: 'env.test' });
-
-// Set default test environment variables
+// Configuration des tests
 process.env['NODE_ENV'] = 'test';
-process.env['JWT_SECRET'] = 'test-jwt-secret-key';
-process.env['JWT_REFRESH_SECRET'] = 'test-jwt-refresh-secret-key';
-process.env['JWT_EXPIRES_IN'] = '15m';
-process.env['JWT_REFRESH_EXPIRES_IN'] = '7d';
+process.env['JWT_SECRET'] = 'test-jwt-secret-key-for-testing-only';
+process.env['JWT_REFRESH_SECRET'] = 'test-jwt-refresh-secret-key-for-testing-only';
 process.env['DATABASE_URL'] = 'postgresql://test:test@localhost:5432/accessgate_test';
-process.env['PORT'] = '8000';
-process.env['CORS_ORIGINS'] = 'http://localhost:3000';
-process.env['RATE_LIMIT_WINDOW_MS'] = '900000';
-process.env['RATE_LIMIT_MAX_REQUESTS'] = '100';
+process.env['LOG_LEVEL'] = 'error'; // Réduire les logs pendant les tests
+
+const prisma = new PrismaClient();
+
+// Nettoyer la base de données avant chaque test
+beforeEach(async () => {
+  try {
+    await prisma.userRole.deleteMany();
+    await prisma.rolePermission.deleteMany();
+    await prisma.permission.deleteMany();
+    await prisma.role.deleteMany();
+    await prisma.user.deleteMany();
+  } catch (error) {
+    testLogger.warn('Error cleaning test database:', error);
+  }
+});
+
+// Nettoyer la base de données après tous les tests
+afterAll(async () => {
+  try {
+    await prisma.userRole.deleteMany();
+    await prisma.rolePermission.deleteMany();
+    await prisma.permission.deleteMany();
+    await prisma.role.deleteMany();
+    await prisma.user.deleteMany();
+    await prisma.$disconnect();
+  } catch (error) {
+    testLogger.warn('Error cleaning up test database:', error);
+  }
+});
+
+// Gestion des erreurs non capturées
+process.on('unhandledRejection', (reason, promise) => {
+  testLogger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  testLogger.error('Uncaught Exception:', error);
+  process.exit(1);
+});
+
+// Augmenter le timeout pour les tests d'intégration
+jest.setTimeout(30000);

@@ -1,0 +1,93 @@
+FROM nginx:alpine
+
+# Create a simple HTML page
+RUN echo '<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AccessGate PoC - RBAC System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .status { background: #e8f5e8; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .api-info { background: #f0f8ff; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 10px 5px; }
+        .btn:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 AccessGate PoC - RBAC System</h1>
+            <p>Role-Based Access Control Proof of Concept</p>
+        </div>
+        
+        <div class="status">
+            <h3>✅ Application Status</h3>
+            <p><strong>Frontend:</strong> Running on port 80 (Kubernetes)</p>
+            <p><strong>Backend API:</strong> <a href="http://accessgate-backend-service:8000" target="_blank">http://accessgate-backend-service:8000</a></p>
+            <p><strong>Database:</strong> PostgreSQL running in Kubernetes</p>
+        </div>
+        
+        <div class="api-info">
+            <h3>🔗 API Endpoints</h3>
+            <p><strong>Health Check:</strong> <a href="http://accessgate-backend-service:8000/health" target="_blank">GET /health</a></p>
+            <p><strong>API Documentation:</strong> <a href="http://accessgate-backend-service:8000/api-docs" target="_blank">GET /api-docs</a></p>
+            <p><strong>Authentication:</strong> POST /api/auth/register, POST /api/auth/login</p>
+            <p><strong>Users:</strong> GET /api/users (requires authentication)</p>
+            <p><strong>Roles:</strong> GET /api/roles (requires authentication)</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="http://accessgate-backend-service:8000/api-docs" class="btn">View API Documentation</a>
+            <a href="http://accessgate-backend-service:8000/health" class="btn">Check API Health</a>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+            <h4>🚀 Kubernetes Deployment</h4>
+            <p>This application is running in Kubernetes with the following components:</p>
+            <ul>
+                <li><strong>Namespace:</strong> accessgate-poc</li>
+                <li><strong>PostgreSQL:</strong> Database service</li>
+                <li><strong>Backend:</strong> Node.js API service</li>
+                <li><strong>Frontend:</strong> Nginx web server</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>' > /usr/share/nginx/html/index.html
+
+# Create nginx config
+RUN echo 'events {
+    worker_connections 1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    
+    server {
+        listen 80;
+        server_name localhost;
+        
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+        
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+    }
+}' > /etc/nginx/nginx.conf
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost/health || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]

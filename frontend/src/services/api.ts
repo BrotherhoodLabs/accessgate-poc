@@ -143,6 +143,18 @@ class ApiService {
     return this.api.get(`/permissions/${id}`);
   }
 
+  async createPermission(permissionData: { name: string; resource: string; action: string; description: string }): Promise<AxiosResponse<Permission>> {
+    return this.api.post('/permissions', permissionData);
+  }
+
+  async updatePermission(id: string, permissionData: { name: string; resource: string; action: string; description: string }): Promise<AxiosResponse<Permission>> {
+    return this.api.put(`/permissions/${id}`, permissionData);
+  }
+
+  async deletePermission(id: string): Promise<AxiosResponse<void>> {
+    return this.api.delete(`/permissions/${id}`);
+  }
+
   async getPermissionsGroupedByResource(): Promise<AxiosResponse<Record<string, Permission[]>>> {
     return this.api.get('/permissions/grouped');
   }

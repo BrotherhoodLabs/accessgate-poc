@@ -1,125 +1,54 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
-
-// Mock Prisma for testing
-export const prisma = {
-  user: {
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-    count: jest.fn(),
-  },
-  role: {
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  },
-  permission: {
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-  },
-  userRole: {
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    create: jest.fn(),
-    delete: jest.fn(),
-    count: jest.fn(),
-  },
-  rolePermission: {
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    create: jest.fn(),
-    delete: jest.fn(),
-    findFirst: jest.fn(),
-  },
-};
+import { correlationIdMiddleware } from '../utils/correlationId';
+import { requestLogger } from '../middleware/requestLogger';
+import { errorHandler } from '../middleware/errorHandler';
+import { rateLimiter } from '../middleware/rateLimiter';
+import { metricsMiddleware } from '../middleware/metrics';
+import authRoutes from '../routes/auth';
+import userRoutes from '../routes/users';
+import roleRoutes from '../routes/roles';
+import permissionRoutes from '../routes/permissions';
+import metricsRoutes from '../routes/metrics';
 
 const app = express();
 
-// Middleware
+// Middleware de base
 app.use(helmet());
 app.use(cors({
-  origin: process.env['CORS_ORIGINS']?.split(',') || ['http://localhost:3000'],
-  credentials: true,
+  origin: process.env['CORS_ORIGINS']?.split(',') || ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: true
 }));
-app.use(express.json({ limit: '10mb' }));
+
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware de logging et métriques
+app.use(correlationIdMiddleware);
+app.use(requestLogger);
+app.use(metricsMiddleware);
+
 // Rate limiting
-const limiter = rateLimit({
-  windowMs: parseInt(process.env['RATE_LIMIT_WINDOW_MS'] || '900000'),
-  max: parseInt(process.env['RATE_LIMIT_MAX_REQUESTS'] || '100'),
-  message: 'Too many requests from this IP, please try again later.',
-});
-app.use('/api/auth', limiter);
+app.use(rateLimiter);
 
 // Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
-// Auth routes (simplified for testing)
-app.post('/api/auth/register', (req, res) => {
-  res.status(201).json({ message: 'User registered successfully' });
-});
-
-app.post('/api/auth/login', (req, res) => {
-  res.status(200).json({ 
-    message: 'Login successful',
-    accessToken: 'test-access-token',
-    refreshToken: 'test-refresh-token'
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
   });
 });
 
-// Users routes (simplified for testing)
-app.get('/api/users', (req, res) => {
-  res.status(200).json({
-    data: [],
-    pagination: {
-      page: 1,
-      limit: 10,
-      total: 0,
-      pages: 0
-    }
-  });
-});
+// Routes API
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/roles', roleRoutes);
+app.use('/api/permissions', permissionRoutes);
+app.use('/api/metrics', metricsRoutes);
 
-app.post('/api/users', (req, res) => {
-  res.status(201).json({
-    message: 'User created successfully',
-    user: { id: 'test-user-id', ...req.body }
-  });
-});
+// Middleware de gestion d'erreurs
+app.use(errorHandler);
 
-app.patch('/api/users/:id', (req, res) => {
-  res.status(200).json({
-    message: 'User updated successfully',
-    user: { id: req.params.id, ...req.body }
-  });
-});
-
-app.delete('/api/users/:id', (req, res) => {
-  res.status(200).json({
-    message: 'User deleted successfully'
-  });
-});
-
-app.post('/api/users/:id/roles', (req, res) => {
-  res.status(200).json({
-    message: 'Role assigned successfully'
-  });
-});
-
-app.delete('/api/users/:id/roles/:roleId', (req, res) => {
-  res.status(200).json({
-    message: 'Role removed successfully'
-  });
-});
-
-export default app;
+export { app };

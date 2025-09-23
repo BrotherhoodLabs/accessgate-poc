@@ -17,7 +17,6 @@ export const requestLogger = pinoHttp({
     }),
     res: (res: Response) => ({
       statusCode: res.statusCode,
-      headers: res.getHeaders(),
     }),
   },
   customLogLevel: (req: RequestWithCorrelationId, res: Response, err?: Error) => {

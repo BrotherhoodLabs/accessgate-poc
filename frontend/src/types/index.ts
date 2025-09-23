@@ -105,6 +105,21 @@ export interface UpdateUserForm {
   roleIds?: string[];
 }
 
+// Permission types
+export interface CreatePermissionForm {
+  name: string;
+  resource: string;
+  action: string;
+  description: string;
+}
+
+export interface UpdatePermissionForm {
+  name?: string;
+  resource?: string;
+  action?: string;
+  description?: string;
+}
+
 export interface CreateRoleForm {
   name: string;
   description: string;

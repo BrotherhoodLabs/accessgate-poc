@@ -38,7 +38,7 @@ spec:
               name: accessgate-config
               key: LOG_LEVEL
         - name: DATABASE_URL
-          value: "postgresql://accessgate:$(POSTGRES_PASSWORD)@postgres-service:5432/accessgate"
+          value: "postgresql://accessgate:accessgate123@postgres-service:5432/accessgate"
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:

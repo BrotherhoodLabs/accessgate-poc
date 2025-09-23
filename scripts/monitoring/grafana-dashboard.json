@@ -1,0 +1,137 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "AccessGate PoC - E2E Tests Dashboard",
+    "tags": ["accessgate", "e2e", "testing"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Test Results Overview",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(test_success_rate[5m]))",
+            "legendFormat": "Success Rate %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 70},
+                {"color": "green", "value": 90}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Test Duration Over Time",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "test_total_duration",
+            "legendFormat": "Total Duration (s)"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Test Results by Component",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (component) (test_success_rate)",
+            "legendFormat": "{{component}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "API Health Metrics",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "health_uptime",
+            "legendFormat": "Backend Uptime"
+          },
+          {
+            "expr": "users_count",
+            "legendFormat": "Users Count"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "Error Rate by Test Type",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(user_registration_failure[5m])",
+            "legendFormat": "Registration Failures"
+          },
+          {
+            "expr": "rate(user_login_failure[5m])",
+            "legendFormat": "Login Failures"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "Recent Test Events",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{component=~\"playwright_tester|api_tester\"}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}

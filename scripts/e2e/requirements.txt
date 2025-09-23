@@ -1,0 +1,4 @@
+# Dépendances pour les tests E2E AccessGate PoC
+playwright>=1.40.0
+requests>=2.31.0
+asyncio

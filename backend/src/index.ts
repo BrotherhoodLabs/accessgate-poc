@@ -8,6 +8,7 @@ import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import roleRoutes from './routes/roles';
+import permissionRoutes from './routes/permissions';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -47,6 +48,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/roles', roleRoutes);
+app.use('/api/permissions', permissionRoutes);
 
 // Error handling
 app.use(errorHandler);

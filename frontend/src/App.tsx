@@ -5,9 +5,12 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { useAuthStore } from './store/authStore';
 import { Layout } from './components/Layout';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { NotificationProvider } from './components/NotificationProvider';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { UsersPage } from './pages/UsersPage';
+import { RolesPage } from './pages/RolesPage';
 
 const theme = createTheme({
   palette: {
@@ -32,8 +35,9 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <Routes>
+      <NotificationProvider>
+        <Router>
+          <Routes>
           {/* Public routes */}
           <Route
             path="/login"
@@ -59,11 +63,32 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute requiredPermissions={['user.read']}>
+                <Layout>
+                  <UsersPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/roles"
+            element={
+              <ProtectedRoute requiredPermissions={['role.read']}>
+                <Layout>
+                  <RolesPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
 
           {/* Catch all route */}
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
+          </Routes>
+        </Router>
+      </NotificationProvider>
     </ThemeProvider>
   );
 }

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { RoleController } from '../controllers/roleController';
 import { checkAuth, requirePermission } from '../middleware/auth';
 
 const router = Router();
@@ -7,28 +8,24 @@ const router = Router();
 router.use(checkAuth);
 
 // GET /api/roles - List roles
-router.get('/', requirePermission('role.read'), (req, res) => {
-  res.json({ message: 'Roles endpoint - to be implemented' });
-});
+router.get('/', requirePermission('role.read'), RoleController.getRoles);
+
+// GET /api/roles/:id - Get role by ID
+router.get('/:id', requirePermission('role.read'), RoleController.getRoleById);
 
 // POST /api/roles - Create role
-router.post('/', requirePermission('role.write'), (req, res) => {
-  res.json({ message: 'Create role endpoint - to be implemented' });
-});
+router.post('/', requirePermission('role.write'), RoleController.createRole);
 
 // PATCH /api/roles/:id - Update role
-router.patch('/:id', requirePermission('role.write'), (req, res) => {
-  res.json({ message: 'Update role endpoint - to be implemented' });
-});
+router.patch('/:id', requirePermission('role.write'), RoleController.updateRole);
 
 // DELETE /api/roles/:id - Delete role
-router.delete('/:id', requirePermission('role.delete'), (req, res) => {
-  res.json({ message: 'Delete role endpoint - to be implemented' });
-});
+router.delete('/:id', requirePermission('role.delete'), RoleController.deleteRole);
 
 // POST /api/roles/:id/permissions - Assign permission to role
-router.post('/:id/permissions', requirePermission('role.write'), (req, res) => {
-  res.json({ message: 'Assign permission endpoint - to be implemented' });
-});
+router.post('/:id/permissions', requirePermission('role.write'), RoleController.assignPermission);
+
+// DELETE /api/roles/:id/permissions/:permissionId - Remove permission from role
+router.delete('/:id/permissions/:permissionId', requirePermission('role.write'), RoleController.removePermission);
 
 export default router;

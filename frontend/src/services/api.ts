@@ -110,6 +110,10 @@ class ApiService {
     return this.api.get('/roles');
   }
 
+  async getRoleById(id: string): Promise<AxiosResponse<Role>> {
+    return this.api.get(`/roles/${id}`);
+  }
+
   async createRole(roleData: CreateRoleForm): Promise<AxiosResponse<{ role: Role }>> {
     return this.api.post('/roles', roleData);
   }
@@ -133,6 +137,14 @@ class ApiService {
   // Permission endpoints
   async getPermissions(): Promise<AxiosResponse<Permission[]>> {
     return this.api.get('/permissions');
+  }
+
+  async getPermissionById(id: string): Promise<AxiosResponse<Permission>> {
+    return this.api.get(`/permissions/${id}`);
+  }
+
+  async getPermissionsGroupedByResource(): Promise<AxiosResponse<Record<string, Permission[]>>> {
+    return this.api.get('/permissions/grouped');
   }
 }
 

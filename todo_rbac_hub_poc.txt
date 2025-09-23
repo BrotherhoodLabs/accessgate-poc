@@ -1,0 +1,123 @@
+
+TODO: rbac-hub-poc — RBAC réutilisable pour tous les PoC (Node.js + React, packages + service)
+Organisation: https://github.com/BrotherhoodLabs/
+Repo cible: BrotherhoodLabs/rbac-hub-poc (SSH)
+
+1. Créer le repository GitHub via SSH
+   - Nom du repo: rbac-hub-poc (public ou privé)
+   - Clé SSH configurée, protection de branche main, PR template
+   - Arborescence initiale: packages/, service/, admin/, examples/, infra/, docs/, .github/workflows/, .gitignore, LICENSE, README.md
+
+2. Vision & principes (docs/vision.md)
+   - Objectif: fournir un RBAC générique et réutilisable en 3 formes:
+     (A) Service autonome (HTTP/REST + JWT/OIDC)
+     (B) SDK serveur (Node.js) à intégrer dans un backend existant
+     (C) SDK client (React) pour guard UI + hooks
+   - Contraintes: simple à intégrer, configurable, multi-tenant, portable (Docker)
+   - Hors scope: SSO avancé (optionnel PoC)
+
+3. Politique de commits & push
+   - Après CHAQUE ticket: commit + push (Google/Conventional: <type>(scope): message)
+   - Exemples: feat(service): add /authorize endpoint ; feat(sdk-react): add usePermission hook
+
+4. Conception modèle RBAC (docs/rbac-model.md)
+   - Entités: Tenant, User, Role, Permission, Resource, UserRole, RolePermission
+   - Option: Role hierarchies (parentId), Resource patterns (ex: invoice:*)
+   - Format permission: action:resource (ex: read:user, write:role)
+   - Diagramme relationnel + exemples JSON
+
+5. Base de données & migrations
+   - Choix: PostgreSQL (PoC) ; option SQLite pour tests
+   - ORM: Prisma
+   - Migrations initiales + seed: 1 tenant par défaut, rôles (ADMIN, MANAGER, VIEWER), permissions de base
+
+6. Package SDK Serveur (packages/rbac-server-sdk)
+   - Node.js + TypeScript
+   - Expose: initRbac({datasource}), checkPermission(userId, action, resource), getUserPermissions(userId)
+   - Middlewares Express/Fastify: requireAuth, requirePermission("action:resource")
+   - Publier en GitHub Packages (docs/publish.md)
+
+7. Package SDK React (packages/rbac-react)
+   - Hooks: useAuth(), usePermissions(), useCan("action:resource")
+   - Components: <RequirePermission perm="action:resource">...</RequirePermission>
+   - Helpers: buildMenuByPermissions(mapConfig)
+   - Publier en GitHub Packages
+
+8. Service autonome (service/)
+   - Node.js 20 + Fastify (ou Express) + TypeScript
+   - Endpoints:
+     - Auth (PoC): POST /auth/login (JWT), POST /auth/refresh
+     - RBAC mgmt: GET/POST/PATCH/DELETE /roles, /permissions
+     - Assignations: POST /users/:id/roles, POST /roles/:id/permissions
+     - Autorisation: POST /authorize { userId, action, resource } → { allow: boolean, reasons: [] }
+   - Politique JWT: access 15m, refresh 7j
+   - OpenAPI (swagger) générée
+
+9. Admin UI (admin/ — React)
+   - Pages: Login, Dashboard, Users, Roles, Permissions, Tenants
+   - Actions: CRUD rôle/permission, assigner rôles aux utilisateurs, tester autorisation (console /authorize)
+   - Guards UI avec packages/rbac-react
+   - Tableaux (pagination simple), filtres, toasts, loaders
+
+10. Multi-tenant (PoC)
+    - Colonne tenantId sur entités ; user ↔ tenant
+    - Contrainte: toutes les requêtes portent un tenantId (header ou token claim)
+    - Seed: 2 tenants de démo (TENANT_A, TENANT_B)
+
+11. Stratégies d’autorisation (docs/strategies.md)
+    - Stratégie RBAC pure (rôle → permissions)
+    - Extension optionnelle: ABAC léger (attributs user/resource) via policy hook custom
+    - Priorité: deny-overrides vs permit-overrides (définir)
+
+12. Endpoints d’intégration pour PoC externes
+    - REST: POST /authorize (synchrone)
+    - Découverte: GET /.well-known/rbac.json (capabilities, versions)
+    - Webhooks (option): POST /webhooks/audit pour recevoir logs
+    - docs/integration.md: exemples Node/Java/Go + cURL
+
+13. Observabilité minimale
+    - Health: GET /health, /ready, /live
+    - Logs JSON (pino) + correlationId middleware
+    - Metrices basiques (requêtes, latences, décisions allow/deny)
+
+14. Sécurité de base
+    - CORS configurable ; Helmet (headers)
+    - Rate limiting sur /auth et /authorize
+    - Validation schémas (zod/yup) ; normalisation inputs
+
+15. Docker & docker-compose
+    - Dockerfile service + admin ; images légères
+    - docker-compose: postgres, service, admin
+    - Variables: DATABASE_URL, JWT_SECRET, ADMIN_EMAIL/PASS, CORS_ORIGINS, PACKAGE_REGISTRY_TOKEN (pour SDKs)
+
+16. CI/CD GitHub Actions
+    - Build & test: packages (SDK server + SDK react), service, admin
+    - Publication GitHub Packages (SDKs) sur tag v0.x
+    - Lint/format (ESLint/Prettier), rapport tests, badges README
+
+17. Jeux de données & seeds (docs/seeds.md)
+    - Rôles et permissions par défaut (tableau)
+    - Exemples de ressources (ex: itinerary, booking, user, role)
+    - Comptes de démo (admin@tenantA, manager@tenantA, viewer@tenantA, …)
+
+18. Scénarios de démo (docs/demo-scenarios.md)
+    - S1: ADMIN crée un rôle "AGENT" et lui assigne write:booking, read:user
+    - S2: MANAGER ne peut pas supprimer ADMIN (deny 403)
+    - S3: VIEWER ne voit que les pages autorisées (guards UI)
+
+19. Exemple d’intégration (examples/)
+    - example-node-app/: mini-API Express utilisant packages/rbac-server-sdk
+    - example-react-app/: mini UI utilisant packages/rbac-react
+    - README d’intégration rapide (copier-coller)
+
+20. Tests
+    - Unit: services (policy evaluate), SDKs (checkPermission, hooks)
+    - Intégration: /authorize, assignations, multi-tenant separation
+    - Objectif couverture: 70% (PoC)
+
+21. Versioning & compat
+    - Semver (0.y.0 en PoC)
+    - Compatibilité documentée entre service & SDKs (matrix)
+
+22. Rétro & axes d’évolution (docs/roadmap.md)
+    - Branches: OIDC (Keycloak), audit trail complet, Policy-as-Code (OPA/Keto), Postgres partitionné, cache Redis

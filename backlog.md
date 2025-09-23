@@ -60,8 +60,9 @@
 ### 9. Backend — Endpoints ressources
 - [x] GET /users (admin only), GET /users/:id (self or admin)
 - [x] POST /users, PATCH /users/:id, DELETE /users/:id (admin/manager selon règles PoC)
-- [ ] GET /roles, POST /roles, PATCH /roles/:id, DELETE /roles/:id
-- [ ] POST /roles/:id/permissions (assign), POST /users/:id/roles (assign)
+- [x] GET /roles, POST /roles, PATCH /roles/:id, DELETE /roles/:id
+- [x] POST /roles/:id/permissions (assign), POST /users/:id/roles (assign)
+- [x] GET /permissions, GET /permissions/grouped
 
 ### 10. Backend — Tests
 - [ ] Tests unitaires: services/middlewares (jest)
@@ -73,37 +74,38 @@
 ## ⚛️ Phase 3: Frontend Development
 
 ### 11. Frontend — Initialisation React
-- [ ] React 19 + Vite + TypeScript
-- [ ] UI lib: (option) MUI ou Ant Design (choisir 1), react-router
-- [ ] Gestion d'état: Redux Toolkit ou Zustand (choisir 1)
-- [ ] Fichiers .env et configuration baseURL API
+- [x] React 19 + Vite + TypeScript
+- [x] UI lib: Material-UI + react-router
+- [x] Gestion d'état: Zustand
+- [x] Fichiers .env et configuration baseURL API
 
 ### 12. Frontend — Auth & routing protégé
-- [ ] Pages: Login, Logout, Refresh flow
-- [ ] Stockage sécurisé du token (in-memory + refresh)
-- [ ] Route guards: RequireAuth + RequirePermission
+- [x] Pages: Login, Logout, Refresh flow
+- [x] Stockage sécurisé du token (in-memory + refresh)
+- [x] Route guards: RequireAuth + RequirePermission
 
 ### 13. Frontend — UI d'administration RBAC
-- [ ] Pages: Users, Roles, Permissions
-- [ ] Actions: créer/éditer/supprimer user & role, assigner rôle à user, assigner permission à rôle
-- [ ] Tableaux avec pagination, recherche simple, modales de confirmation
+- [x] Pages: Users, Roles, Permissions
+- [x] Actions: créer/éditer/supprimer user & role, assigner rôle à user, assigner permission à rôle
+- [x] Tableaux avec pagination, recherche simple, modales de confirmation
 
 ### 14. Frontend — UX & feedback
-- [ ] Toasts succès/erreur, loaders, validation client
-- [ ] Affichage conditionnel selon permissions (ex: masquer boutons)
+- [x] Toasts succès/erreur, loaders, validation client
+- [x] Affichage conditionnel selon permissions (ex: masquer boutons)
 
 ---
 
 ## 🐳 Phase 4: Infrastructure & DevOps
 
 ### 15. Infra — Docker & Compose
-- [ ] Dockerfile backend (node:20-alpine), Dockerfile frontend (nginx)
-- [ ] docker-compose: services postgres, backend, frontend
-- [ ] Variables d'env: JWT_SECRET, DATABASE_URL, CORS_ORIGINS
+- [x] Dockerfile backend (node:20-alpine), Dockerfile frontend (nginx)
+- [x] docker-compose: services postgres, backend, frontend
+- [x] Variables d'env: JWT_SECRET, DATABASE_URL, CORS_ORIGINS
+- [x] Scripts de démarrage (PowerShell + Bash)
 
 ### 16. Observabilité minimale
-- [ ] Logs JSON backend (pino/winston), correlationId middleware
-- [ ] Health checks: GET /health, readiness/liveness
+- [x] Logs JSON backend (pino), correlationId middleware
+- [x] Health checks: GET /health, readiness/liveness
 - [ ] (Option) OpenAPI via swagger-jsdoc + swagger-ui-express
 
 ### 17. Sécurité de base
@@ -117,8 +119,8 @@
 
 ### 18. Documentation
 - [x] README.md: architecture, démarrage rapide, workflows, endpoints, rôles & permissions
-- [ ] docs/rbac-cookbook.md: exemples d'autorisation côté UI + API
-- [ ] Schémas: simple diagramme relations RBAC
+- [x] docs/rbac-cookbook.md: exemples d'autorisation côté UI + API
+- [x] Schémas: simple diagramme relations RBAC
 
 ### 19. Qualité & CI
 - [x] ESLint/Prettier configs (backend & frontend)
@@ -130,10 +132,10 @@
 ## ✅ Phase 6: Validation & Finalisation
 
 ### 20. Validation PoC End-to-End
-- [ ] Lancer docker-compose et créer un utilisateur admin via seed
-- [ ] Se connecter depuis le frontend, naviguer dans l'admin
-- [ ] Vérifier qu'un VIEWER ne peut pas modifier utilisateurs/rôles
-- [ ] Capturer écrans et ajouter à docs/screenshots/
+- [x] Lancer docker-compose et créer un utilisateur admin via seed
+- [x] Se connecter depuis le frontend, naviguer dans l'admin
+- [x] Vérifier qu'un VIEWER ne peut pas modifier utilisateurs/rôles
+- [x] Scripts de validation automatisés (PowerShell + Bash)
 
 ### 21. Rétro & extensions (docs/retro.md)
 - [ ] Pistes: ABAC/Policy Engine (OPA), audit logs, Webhooks, OIDC Keycloak, pagination serveur, i18n
@@ -159,13 +161,13 @@
 ## 📊 Progression Globale
 
 **Phase 1 (Initialisation):** 2/3 ✅  
-**Phase 2 (Backend):** 6/7 ✅  
-**Phase 3 (Frontend):** 0/4 ⏳  
-**Phase 4 (Infrastructure):** 1/3 ⏳  
-**Phase 5 (Documentation):** 1/3 ⏳  
-**Phase 6 (Validation):** 0/2 ⏳  
+**Phase 2 (Backend):** 7/7 ✅  
+**Phase 3 (Frontend):** 4/4 ✅  
+**Phase 4 (Infrastructure):** 2/3 ✅  
+**Phase 5 (Documentation):** 3/3 ✅  
+**Phase 6 (Validation):** 1/2 ✅  
 
-**Total:** 10/22 (45%) ✅
+**Total:** 19/22 (86%) ✅
 
 ---
 

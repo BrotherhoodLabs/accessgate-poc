@@ -13,6 +13,9 @@ import permissionRoutes from './routes/permissions';
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
 import { rateLimiter } from './middleware/rateLimiter';
+import { correlationIdMiddleware } from './middleware/correlationId';
+import { requestLogger } from './middleware/requestLogger';
+import logger from './utils/logger';
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +28,8 @@ export const prisma = new PrismaClient();
 
 // Middleware
 app.use(helmet());
+app.use(correlationIdMiddleware);
+app.use(requestLogger);
 app.use(cors({
   origin: process.env['CORS_ORIGINS']?.split(',') || ['http://localhost:3000'],
   credentials: true,
@@ -76,9 +81,12 @@ process.on('SIGTERM', async () => {
 
 // Start server
 app.listen(port, () => {
-  console.log(`🚀 Server running on port ${port}`);
-  console.log(`📊 Health check: http://localhost:${port}/health`);
-  console.log(`🔐 API Base URL: http://localhost:${port}/api`);
+  logger.info({
+    port,
+    environment: process.env['NODE_ENV'] || 'development',
+  }, `🚀 Server running on port ${port}`);
+  logger.info(`📊 Health check: http://localhost:${port}/health`);
+  logger.info(`🔐 API Base URL: http://localhost:${port}/api`);
 });
 
 export default app;

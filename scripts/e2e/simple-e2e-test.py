@@ -21,7 +21,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(message)s',
     handlers=[
-        logging.FileHandler('e2e-test-results.jsonl'),
+        logging.FileHandler('logs/e2e-test-results.jsonl'),
         logging.StreamHandler(sys.stdout)
     ]
 )

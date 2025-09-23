@@ -86,8 +86,8 @@ Tous les scripts génèrent des logs structurés au format JSONL (JSON Lines) co
 ```
 
 ### Fichiers de Logs
-- `complete-e2e-results.jsonl` - Logs du script principal
-- `e2e-test-results.jsonl` - Logs des tests simples
+- `logs/complete-e2e-results.jsonl` - Logs du script principal
+- `logs/e2e-test-results.jsonl` - Logs des tests simples
 - Console - Affichage en temps réel
 
 ### Métriques Collectées
@@ -105,7 +105,7 @@ Importez le dashboard fourni : `scripts/monitoring/grafana-dashboard.json`
 
 ### Configuration de la Source de Données
 1. Créer une source de données "Loki" ou "JSON"
-2. Pointer vers le fichier `complete-e2e-results.jsonl`
+2. Pointer vers le fichier `logs/complete-e2e-results.jsonl`
 3. Configurer les requêtes pour extraire les métriques
 
 ### Requêtes Exemple

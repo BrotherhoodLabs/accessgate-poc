@@ -224,4 +224,43 @@
 
 ---
 
-*Dernière mise à jour: 23/09/2025 - Application fonctionnelle déployée*
+### ✅ Tests E2E et Scripts Automatisés
+
+#### Scripts E2E Complets
+- [x] **Scripts de test end-to-end** : Tests complets avec Playwright/Selenium
+- [x] **Déploiement Kubernetes automatique** : Scripts de déploiement et nettoyage
+- [x] **Logging structuré pour Grafana** : Métriques et logs compatibles Grafana
+- [x] **Tests de performance** : Validation des performances et stabilité
+- [x] **Scripts de démarrage** : Interface utilisateur pour Windows et Linux
+- [x] **Organisation des fichiers** : Structure propre avec dossiers logiques
+
+#### Organisation des Scripts
+- [x] **scripts/e2e/** : Tests end-to-end complets
+- [x] **scripts/deployment/** : Scripts de déploiement Kubernetes
+- [x] **scripts/monitoring/** : Configuration Grafana et métriques
+- [x] **logs/** : Fichiers de logs structurés
+- [x] **Documentation complète** : README détaillé pour les tests E2E
+
+#### Fonctionnalités E2E
+- [x] **Déploiement automatique** : Tous les composants Kubernetes
+- [x] **Tests API complets** : Health check, inscription, connexion, endpoints protégés
+- [x] **Tests Frontend** : Accès interface, validation contenu, navigation RBAC
+- [x] **Tests Playwright** : Tests d'interface automatisés (optionnel)
+- [x] **Métriques de performance** : Taux de réussite, durée, uptime
+- [x] **Logs structurés** : Format JSONL compatible Grafana
+- [x] **Support multi-plateforme** : Windows PowerShell et Linux Bash
+
+### 📋 Améliorations Futures (Optionnelles)
+
+- [ ] **Tests E2E automatisés avancés** :
+  - [ ] Tests end-to-end avec Playwright/Cypress
+  - [ ] Tests de performance automatisés
+- [ ] **Fonctionnalités avancées** :
+  - [ ] Notifications en temps réel
+  - [ ] Internationalisation (i18n)
+  - [ ] Intégration SSO/OAuth2
+  - [ ] Monitoring avancé avec Grafana
+
+---
+
+*Dernière mise à jour: 23/09/2025 - Application fonctionnelle avec tests E2E complets*

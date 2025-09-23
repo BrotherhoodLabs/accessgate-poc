@@ -61,7 +61,7 @@ try {
         Write-Host "🎉 TESTS E2E RÉUSSIS!" -ForegroundColor Green
         Write-Host ""
         Write-Host "📊 Logs et métriques disponibles:" -ForegroundColor Cyan
-        Write-Host "   - complete-e2e-results.jsonl (logs détaillés)" -ForegroundColor White
+        Write-Host "   - logs/complete-e2e-results.jsonl (logs détaillés)" -ForegroundColor White
         Write-Host "   - Console (affichage en temps réel)" -ForegroundColor White
         Write-Host ""
         Write-Host "🌐 Application accessible sur:" -ForegroundColor Cyan

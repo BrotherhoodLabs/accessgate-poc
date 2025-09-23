@@ -22,7 +22,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(message)s',
     handlers=[
-        logging.FileHandler('complete-e2e-results.jsonl'),
+        logging.FileHandler('logs/complete-e2e-results.jsonl'),
         logging.StreamHandler(sys.stdout)
     ]
 )

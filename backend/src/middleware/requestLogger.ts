@@ -5,7 +5,6 @@ import { RequestWithCorrelationId } from './correlationId';
 
 export const requestLogger = pinoHttp({
   logger,
-  genReqId: (req: RequestWithCorrelationId) => req.correlationId,
   serializers: {
     req: (req: RequestWithCorrelationId) => ({
       method: req.method,
